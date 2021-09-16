@@ -1,0 +1,64 @@
+import React from 'react';
+import { useRouter } from 'next/router';
+import NextLink, { LinkProps as NextLinkProps } from 'next/link';
+import {
+  Link as ChakraLink,
+  LinkProps as CharkraLinkProps,
+} from '@chakra-ui/react';
+
+type NextComposedProps = React.AnchorHTMLAttributes<HTMLAnchorElement> &
+  NextLinkProps;
+
+const NextComposed = React.forwardRef(function NextComposed(
+  props: NextComposedProps,
+  ref: React.Ref<HTMLAnchorElement>,
+) {
+  const { as, href, ...other } = props;
+
+  return (
+    <NextLink href={href} as={as}>
+      <a ref={ref} {...other} />
+    </NextLink>
+  );
+});
+
+interface LinkPropsBase {
+  activeClassName?: string;
+  innerRef?: React.Ref<HTMLAnchorElement>;
+  naked?: boolean;
+}
+
+type LinkProps = LinkPropsBase &
+  NextComposedProps &
+  Omit<CharkraLinkProps, 'ref'>;
+
+function Link(props: LinkProps) {
+  const {
+    href,
+    activeClassName = 'active',
+    className: classNameProps,
+    innerRef,
+    naked,
+    ...other
+  } = props;
+
+  const router = useRouter();
+  const pathname = typeof href === 'string' ? href : href.pathname;
+
+  if (naked) {
+    return <NextComposed ref={innerRef} href={href} {...other} />;
+  }
+
+  return (
+    <ChakraLink
+      component={NextComposed}
+      ref={innerRef}
+      href={href}
+      {...other}
+    />
+  );
+}
+
+export default React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => (
+  <Link {...props} innerRef={ref} />
+));
