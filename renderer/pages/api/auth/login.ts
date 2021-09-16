@@ -43,17 +43,20 @@ const login: NextApiHandler = async (req, res) => {
 
   try {
     // the sid that this responds with needs to be cached for subsequent requests
-    const response = await phin<SunnyResponse<{ sid: string }>>({
+    const response = await phin({
       url,
       data,
-      parse: 'json',
-      method: 'post',
+      method: 'POST',
       timeout: 5000,
       core: { agent, headers },
     });
 
-    console.log({ response: response.body });
-    console.log({ responseHeaders: response.headers });
+    console.log({
+      statusCode: response.statusCode,
+      responseBody: response.body,
+      responseHeaders: response.headers,
+    });
+
     res.send('Success');
   } catch (error) {
     console.error(error);
