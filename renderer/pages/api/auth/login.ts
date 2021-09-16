@@ -1,14 +1,18 @@
 import phin from 'phin';
 import https from 'https';
 import { NextApiHandler } from 'next';
-import { Endpoints } from '../../../lib/config/endpoints';
+import {
+  createLoginCookie,
+  Endpoints,
+  genSessionId,
+} from '../../../lib/config/endpoints';
 import { Privilege } from '../../../auth/types';
 
 type SunnyResponse<T> = {
   result: T;
 };
 
-const getHeaders = (ip: string) => {
+const getHeaders = (ip: string, sessionId: string) => {
   const headers = {
     Host: ip,
     'User-Agent':
@@ -17,7 +21,7 @@ const getHeaders = (ip: string) => {
     'Accept-Language': 'en-US,en;q=0.9',
     'Accept-Encoding': 'gzip, deflate',
     Referer: `https://${ip}/`,
-    Cookie: 'tmhDynamicLocale.locale=%22en-us%22',
+    Cookie: createLoginCookie(sessionId),
     // 'Content-Type': 'application/json;charset=UTF-8',
     // Origin: `https://${ip}`,
   };
@@ -34,9 +38,11 @@ const login: NextApiHandler = async (req, res) => {
 
   const data = { right: Privilege.USER, pass: password };
 
-  const headers = getHeaders(ip);
+  const sessionId = genSessionId();
+  const headers = getHeaders(ip, sessionId);
 
   try {
+    // the sid that this responds with needs to be cached for subsequent requests
     const response = await phin<SunnyResponse<{ sid: string }>>({
       url,
       data,
