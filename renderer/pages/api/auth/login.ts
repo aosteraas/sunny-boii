@@ -27,6 +27,7 @@ const getHeaders = (ip: string) => {
 const agent = new https.Agent({ rejectUnauthorized: false });
 
 const login: NextApiHandler = async (req, res) => {
+  console.log('received');
   const { password, ip } = req.body;
 
   const url = `https://${ip}/${Endpoints.Login}`;
@@ -41,6 +42,7 @@ const login: NextApiHandler = async (req, res) => {
       data,
       parse: 'json',
       method: 'post',
+      timeout: 5000,
       core: { agent, headers },
     });
 

@@ -8,22 +8,28 @@ import {
   FormLabel,
   Input,
 } from '@chakra-ui/react';
-import { genSid } from '../auth/requests';
 
 function Home() {
   const [ip, setIp] = useState('');
   const [password, setPassword] = useState('');
-  const [lsid, setLsid] = useState(genSid());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [ssid, setSsid] = useState('');
-  const [loginMeta, setLoginMeta] = useState<any>();
 
-  const onSubmit = async (e: React.FormEvent) => {};
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ ip, password }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      setIsLoggedIn(res.status === 200);
+    } catch (err) {}
+  };
 
   return (
     <>
       <Head>
-        <title>Log in - Sunny Boi</title>
+        <title>Log in - Sunny Boii</title>
       </Head>
 
       <Flex flexDir="column" minH="100vh">
@@ -33,7 +39,7 @@ function Home() {
           justifyContent="center"
           minH="100vh"
         >
-          <Heading pb={8}>Sunny Boi</Heading>
+          <Heading pb={8}>Sunny Boii</Heading>
           <form onSubmit={onSubmit}>
             <FormControl isRequired id="ip">
               <FormLabel>IP</FormLabel>
@@ -50,11 +56,6 @@ function Home() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-            </FormControl>
-            <FormControl pt="1rem">
-              <Button colorScheme="blue" type="submit">
-                Login
-              </Button>
             </FormControl>
             <FormControl pt="1rem">
               <Button colorScheme="blue" type="submit">
