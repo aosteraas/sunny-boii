@@ -46,6 +46,7 @@ const login: NextApiHandler = async (req, res) => {
     const response = await phin({
       url,
       data,
+      parse: 'string',
       method: 'POST',
       timeout: 5000,
       core: { agent, headers },
